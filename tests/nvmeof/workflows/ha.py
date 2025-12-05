@@ -487,9 +487,6 @@ class HighAvailability:
             Boolean
         """
         # check if cloud_type is openstack then power on/off the node
-        import pdb
-
-        pdb.set_trace()
         if self.config.get("cloud-type") == "openstack":
             LOG.info(
                 f"Powering on/off {gateway.node.hostname} node in "
