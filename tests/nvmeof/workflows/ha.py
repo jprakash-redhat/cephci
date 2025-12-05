@@ -24,6 +24,7 @@ from tests.nvmeof.workflows.nvme_utils import (
 from utility.log import Log
 from utility.retry import retry
 from utility.utils import log_json_dump
+from ceph.utils import find_vm_node_by_hostname
 
 LOG = Log(__name__)
 
@@ -485,43 +486,63 @@ class HighAvailability:
         Returns:
             Boolean
         """
-        osp_cred = self.config.get("osp_cred")
-        driver = get_openstack_driver(osp_cred)
-        ops = {
-            "start": driver.ex_start_node,
-            "stop": driver.ex_stop_node,
-            "is-active": self.is_node_active,
-        }
-        nodename = gateway.node.hostname.lower().replace("-", "_")
-        driver_node = next(
-            (
-                node
-                for node in driver.list_nodes()
-                if node.name.lower().replace("-", "_") == nodename
-            ),
-            None,
-        )
+        # check if cloud_type is openstack then power on/off the node
+        import pdb
 
-        op = ops[action]
-        op(driver_node)
-
-        if wait_for_active_state is None:
-            return
-
-        is_active = ops["is-active"]
-        for w in WaitUntil(timeout=300):
-            _active = is_active(driver, driver_node)
-            if _active == wait_for_active_state:
-                LOG.info(f"[ {nodename} ] {action} is successfull.")
-                return True
-            LOG.warning(
-                f"[ {nodename} ] {action} is still not successfull. check again"
+        pdb.set_trace()
+        if self.config.get("cloud-type") == "openstack":
+            LOG.info(
+                f"Powering on/off {gateway.node.hostname} node in "
+                f"environment {self.config.get('cloud-type')} in {action} mode"
+            )
+            osp_cred = self.config.get("osp_cred")
+            driver = get_openstack_driver(osp_cred)
+            ops = {
+                "start": driver.ex_start_node,
+                "stop": driver.ex_stop_node,
+                "is-active": self.is_node_active,
+            }
+            nodename = gateway.node.hostname.lower().replace("-", "_")
+            driver_node = next(
+                (
+                    node
+                    for node in driver.list_nodes()
+                    if node.name.lower().replace("-", "_") == nodename
+                ),
+                None,
             )
 
-        if w.expired:
-            LOG.error(f"[ {nodename} ] {action} failed even after 300s timeout..")
+            op = ops[action]
+            op(driver_node)
 
-        return False
+            if wait_for_active_state is None:
+                return
+
+            is_active = ops["is-active"]
+            for w in WaitUntil(timeout=300):
+                _active = is_active(driver, driver_node)
+                if _active == wait_for_active_state:
+                    LOG.info(f"[ {nodename} ] {action} is successfull.")
+                    return True
+                LOG.warning(
+                    f"[ {nodename} ] {action} is still not successfull. check again"
+                )
+
+            if w.expired:
+                LOG.error(f"[ {nodename} ] {action} failed even after 300s timeout..")
+
+            return False
+        elif self.config.get("cloud-type") == "ibmc":
+            LOG.info(
+                f"Powering on/off {gateway.node.hostname} node in "
+                f"environment {self.config.get('cloud-type')} in {action} mode"
+            )
+            vm_node = find_vm_node_by_hostname(self.cluster, gateway.node.hostname)
+            if action == "start":
+                vm_node.power_on()
+            elif action == "stop":
+                vm_node.shutdown(wait=True)
+            return False
 
     def scale_down(self, gateway_nodes_to_be_scaleddown):
         """Scaling down of the NVMeoF Gateways.
