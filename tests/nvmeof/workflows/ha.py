@@ -537,8 +537,10 @@ class HighAvailability:
             vm_node = find_vm_node_by_hostname(self.cluster, gateway.node.hostname)
             if action == "start":
                 vm_node.power_on()
+                return True
             elif action == "stop":
                 vm_node.shutdown(wait=True)
+                return True
             return False
 
     def scale_down(self, gateway_nodes_to_be_scaleddown):

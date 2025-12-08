@@ -759,7 +759,6 @@ class CephVMNodeIBM:
                 continue
 
             node_details = resp.get_result()
-            LOG.debug(f"Node details: {node_details}")
             if node_details["status"] == target_state:
                 end_time = datetime.now()
                 duration = (end_time - start_time).total_seconds()
@@ -772,9 +771,6 @@ class CephVMNodeIBM:
                 return
 
             if node_details["status"] == "failed":
-                sleep(30)
-                node_details = resp.get_result()
-                LOG.debug(f"Node details: {node_details}")
                 raise NodeError(node_details["status_reasons"])
 
         raise NodeError(f"{node_details['name']} is in {node_details['status']} state.")
