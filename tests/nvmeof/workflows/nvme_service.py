@@ -61,9 +61,15 @@ class NVMeService:
         If ceph_version < 20.2.1, use config['nvme_metadata_pool'].
         """
         if LooseVersion(self.ceph_version) >= LooseVersion("20.2.1"):
-            # print the nvmeof metadata pool
-            LOG.info(f"Using NVMeoF metadata pool: {DEFAULT_NVME_METADATA_POOL}")
-            return DEFAULT_NVME_METADATA_POOL
+            # # print the nvmeof metadata pool
+            # LOG.info(f"Using NVMeoF metadata pool: {DEFAULT_NVME_METADATA_POOL}")
+            # return DEFAULT_NVME_METADATA_POOL
+            LOG.info(
+                f"Using NVMe metadata pool: {self.config.get('nvme_metadata_pool')}"
+            )
+            if not self.config.get("nvme_metadata_pool"):
+                raise ValueError("Please provide RBD pool name via nvme_metadata_pool")
+            return self.config.get("nvme_metadata_pool")
         else:
             LOG.info(
                 f"Using NVMe metadata pool: {self.config.get('nvme_metadata_pool')}"
@@ -147,6 +153,7 @@ class NVMeService:
                         "service_id"
                     ] = f"{self.nvme_metadata_pool}.{self.group}"
                     cfg["config"]["specs"][0]["spec"]["group"] = self.group
+                    cfg["config"]["specs"][0]["spec"]["pool"] = self.nvme_metadata_pool
                 else:
                     if LooseVersion(self.ceph_version) >= LooseVersion("20.2.1"):
                         cfg["config"]["args"].update({"group": self.group})

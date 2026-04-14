@@ -131,8 +131,8 @@ def configure_subsystems(nvme_service, ceph_cluster=None):
             "no-group-append": no_group_append,
         }
 
-        if LooseVersion(ceph_version) >= LooseVersion("20.2.1"):
-            args["network-mask"] = get_network_mask(nvme_service.gateways)
+        # if LooseVersion(ceph_version) >= LooseVersion("20.2.1"):
+        #     args["network-mask"] = get_network_mask(nvme_service.gateways)
 
         gateway.subsystem.add(**{"args": args})
 

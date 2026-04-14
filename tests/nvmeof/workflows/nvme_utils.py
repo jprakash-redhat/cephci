@@ -198,6 +198,7 @@ def apply_nvme_sdk_cli_support(ceph_cluster, config):
         if is_spec_or_mtls:
             cfg["config"]["specs"][0]["service_id"] = f"{rbd_pool}.{gw_group}"
             cfg["config"]["specs"][0]["spec"]["group"] = gw_group
+            cfg["config"]["specs"][0]["spec"]["pool"] = rbd_pool
         else:
             cfg["config"]["pos_args"].append(gw_group)
 
