@@ -117,9 +117,9 @@ class NVMeService:
             },
         }
 
-        # Delete pool key from spec if ceph_version >= 20.2.1
-        if LooseVersion(self.ceph_version) >= LooseVersion("20.2.1"):
-            spec["spec"].pop("pool")
+        # # Delete pool key from spec if ceph_version >= 20.2.1
+        # if LooseVersion(self.ceph_version) >= LooseVersion("20.2.1"):
+        #     spec["spec"].pop("pool")
 
         # Add encryption if specified
         if self.inband_auth_mode:
@@ -179,6 +179,7 @@ class NVMeService:
                     "command": "apply",
                     "service": "nvmeof",
                     "args": {
+                        "pool": self.nvme_metadata_pool,
                         "placement": self._get_placement_config(
                             self.config, self.gw_nodes
                         )
@@ -188,7 +189,7 @@ class NVMeService:
             }
 
             if LooseVersion(self.ceph_version) >= LooseVersion("20.2.1"):
-                cfg["config"]["args"].update({"group": self.group})
+                cfg["config"]["args"].update({"group": self.group, "pool": self.nvme_metadata_pool})
                 # Delete pos_args key from cfg
                 cfg["config"].pop("pos_args")
 

@@ -506,8 +506,8 @@ def configure_gw_entities(nvme_service, rbd_obj=None, cluster=None):
     ceph_version = get_ceph_version_from_cluster(cluster.get_nodes(role="client")[0])
     if subsystem_config:
         configure_subsystems(nvme_service, ceph_cluster=cluster)
-        if LooseVersion(ceph_version) <= LooseVersion("20.2.1"):
-            configure_listeners(nvme_service.gateways, nvme_service.config)
+        # if LooseVersion(ceph_version) <= LooseVersion("20.2.1"):
+        configure_listeners(nvme_service.gateways, nvme_service.config)
         configure_hosts(
             nvme_service.gateways[0], nvme_service.config, ceph_cluster=cluster
         )
