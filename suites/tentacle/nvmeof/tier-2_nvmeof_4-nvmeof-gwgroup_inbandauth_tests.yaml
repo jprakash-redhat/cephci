@@ -194,6 +194,8 @@ tests:
           - gw_group: group1
             inband_auth_mode: bidirectional
             nvme_metadata_pool: rbd
+            enable_encryption: true
+            encryption_key_path: true
             gw_nodes:
               - node6
               - node7
