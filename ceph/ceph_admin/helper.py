@@ -8,7 +8,6 @@ import tempfile
 from datetime import datetime, timedelta
 from os.path import dirname
 from time import sleep
-from tkinter import NO
 from typing import Optional
 
 from dateutil import parser

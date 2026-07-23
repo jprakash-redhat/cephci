@@ -115,7 +115,7 @@ class NVMeService:
         # Add encryption if specified (TLS pre-shared key generated on installer)
         if self.inband_auth_mode:
             spec["encryption"] = True
-        
+
         # Add support for enable_encryption and encryption_key_path params
         # Refer https://ibm-ceph.atlassian.net/browse/IBMCEPH-16168
         if self.config.get("enable_encryption", False):
