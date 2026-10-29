@@ -656,8 +656,9 @@ def teardown(nvme_service, rbd_obj, cleanup_config=None):
         rbd_obj: RBD object for pool cleanup
     """
     rc = 0
-    # Disconnect initiators
-    if "initiators" in nvme_service.config.get("cleanup", []):
+    # Disconnect initiators ("initiators" and legacy "disconnect_all" aliases)
+    cleanup = nvme_service.config.get("cleanup", [])
+    if "initiators" in cleanup or "disconnect_all" in cleanup:
         disconnect_initiators(nvme_service)
 
     # Delete the multiple subsystems across multiple gateways.
